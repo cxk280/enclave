@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  addAuditEntry,
   getAuditSummary,
   listAuditEntries,
   recordAnalysis,
@@ -51,6 +52,20 @@ describe("audit trail", () => {
     ).toEqual(["inference", "upload"]);
     expect(after[0].operator).toBeTruthy();
     // the chain is still valid after appending
+    expect(verifyAuditChain()).toBe(true);
+  });
+
+  it("bounds memory: the store is capped and the retained window still verifies", () => {
+    for (let i = 0; i < 700; i++) {
+      addAuditEntry({
+        timestamp: "2026-07-04T12:00:00",
+        operator: "N. Dlamini",
+        action: "view",
+        subjectId: "SUBJ-1",
+        regionId: "af-south-1",
+      });
+    }
+    expect(listAuditEntries().length).toBeLessThanOrEqual(500);
     expect(verifyAuditChain()).toBe(true);
   });
 });

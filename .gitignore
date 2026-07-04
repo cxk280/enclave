@@ -31,3 +31,8 @@ test-results/
 
 # Logs
 *.log
+
+# local working records
+docs/EDGE_CASES.md
+docs/USERS.md
+docs/USER_PERSONAS_FINDING.md

@@ -7,17 +7,22 @@ import { Download } from "lucide-react";
  *  data (no external call). */
 export function ExportAudit() {
   async function onExport() {
-    const res = await fetch("/api/audit");
-    const data = await res.json();
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "enclave-audit-af-south-1.json";
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const res = await fetch("/api/audit");
+      if (!res.ok) return;
+      const data = await res.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "enclave-audit-af-south-1.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      // Same-origin export; nothing actionable in the demo if it fails.
+    }
   }
 
   return (

@@ -19,6 +19,12 @@ import { OPERATORS } from "./sample-case";
 
 const GENESIS = "0".repeat(64);
 
+/** Cap on the in-memory log so an unauthenticated analyze loop can't grow the
+ *  process unboundedly. Older entries are evicted; the retained window stays
+ *  chain-verifiable (see verifyAuditChain). */
+const MAX_ENTRIES = 500;
+let evicted = 0;
+
 let counter = 0;
 const nextId = () => `ae-${(++counter).toString().padStart(4, "0")}`;
 
@@ -102,6 +108,10 @@ export function addAuditEntry(input: ChainInput): AuditEntry {
     fullHash: headHash,
   };
   store.push(entry);
+  if (store.length > MAX_ENTRIES) {
+    store.shift();
+    evicted++;
+  }
   return entry;
 }
 
@@ -115,12 +125,25 @@ export function recordAnalysis(input: {
   addAuditEntry({ ...input, operator: OPERATORS[0], action: "inference" });
 }
 
-/** Recompute the chain from genesis; false if any row was altered/removed. */
+/**
+ * Verify the retained window is internally consistent: each entry's hash must
+ * equal chainHash(previous entry's hash, this entry). If nothing has been
+ * evicted, the first entry is also anchored to GENESIS. Returns false if any
+ * retained row was altered or dropped out of sequence.
+ */
 export function verifyAuditChain(): boolean {
-  let prev = GENESIS;
-  for (const e of store) {
-    prev = chainHash(prev, e);
-    if (prev !== e.fullHash) return false;
+  for (let i = 0; i < store.length; i++) {
+    if (i === 0) {
+      // Once entries have been evicted, store[0]'s real predecessor is gone, so
+      // it serves as a trusted anchor and can't be recomputed from genesis.
+      if (evicted === 0 && chainHash(GENESIS, store[0]) !== store[0].fullHash) {
+        return false;
+      }
+      continue;
+    }
+    if (chainHash(store[i - 1].fullHash, store[i]) !== store[i].fullHash) {
+      return false;
+    }
   }
   return true;
 }
