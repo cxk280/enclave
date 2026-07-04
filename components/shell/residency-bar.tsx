@@ -15,7 +15,7 @@ export function ResidencyBar() {
   const { region } = useRegion();
 
   return (
-    <header className="sticky top-0 z-30 flex items-center gap-4 border-b border-border-subtle bg-surface px-6 py-2.5">
+    <header className="sticky top-0 z-30 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border-subtle bg-surface px-4 py-2.5 sm:px-6">
       <div className="flex items-center gap-3">
         <Link
           href="/settings"
@@ -35,19 +35,21 @@ export function ResidencyBar() {
       <div className="flex-1" />
 
       <div className="flex items-center gap-3.5">
-        <div className="flex items-center gap-1.5">
-          <Lock size={15} className="text-green" />
-          <span className="text-[13px] text-ink-muted">Operator:</span>
-          <span className="text-[13px] font-semibold text-ink">national staff</span>
-        </div>
-        <span className="h-4 w-px bg-border-strong" />
-        <div className="flex items-center gap-1.5">
-          <span className="relative flex h-2.5 w-2.5" aria-hidden>
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-heartbeat opacity-60" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-heartbeat" />
-          </span>
-          <span className="text-[13px] font-medium text-green-text">In-region</span>
-          <span className="text-[13px] text-ink-muted">live</span>
+        <div className="hidden items-center gap-3.5 md:flex">
+          <div className="flex items-center gap-1.5">
+            <Lock size={15} className="text-green" />
+            <span className="text-[13px] text-ink-muted">Operator:</span>
+            <span className="text-[13px] font-semibold text-ink">national staff</span>
+          </div>
+          <span className="h-4 w-px bg-border-strong" />
+          <div className="flex items-center gap-1.5">
+            <span className="relative flex h-2.5 w-2.5" aria-hidden>
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-heartbeat opacity-60" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-heartbeat" />
+            </span>
+            <span className="text-[13px] font-medium text-green-text">In-region</span>
+            <span className="text-[13px] text-ink-muted">live</span>
+          </div>
         </div>
         <ThemeToggle />
       </div>

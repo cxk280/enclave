@@ -59,7 +59,7 @@ export default function WorkspacePage() {
   const [loaded, setLoaded] = useState(false);
 
   return (
-    <div className="flex justify-center p-8">
+    <div className="flex justify-center p-4 sm:p-8">
       <div className="flex w-full max-w-[1040px] flex-col gap-7 py-6">
         <header>
           <Eyebrow tone="green">New analysis</Eyebrow>
@@ -99,7 +99,7 @@ export default function WorkspacePage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Button variant="secondary" onClick={() => setLoaded(true)}>
             <Zap size={18} />
             Load sample case

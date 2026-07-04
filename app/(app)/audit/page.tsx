@@ -13,7 +13,7 @@ export default function AuditPage() {
   const summary = getAuditSummary();
 
   return (
-    <div className="flex flex-col gap-5 p-8">
+    <div className="flex flex-col gap-5 p-4 sm:p-8">
       <div className="flex items-start justify-between gap-4">
         <div>
           <Eyebrow tone="green">Compliance evidence</Eyebrow>
@@ -49,8 +49,8 @@ export default function AuditPage() {
         />
       </div>
 
-      <div className="flex items-center gap-2.5">
-        <div className="flex flex-1 items-center gap-2 rounded-md border border-border-strong bg-surface px-3.5 py-2.5">
+      <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex min-w-[200px] flex-1 items-center gap-2 rounded-md border border-border-strong bg-surface px-3.5 py-2.5">
           <Search size={16} className="text-ink-muted" />
           <input
             readOnly
