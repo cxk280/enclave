@@ -25,4 +25,40 @@ Leaving an L40S on 24/7 would be ~$650+/mo, so **destroy the GPU instance when n
 production Sovereign Cloud is an enterprise/contact-sales product; this showcase reproduces the
 guarantee with a standard **in-region** GPU plus the residency/audit UX at self-serve prices.
 
-See [`PLAN.md`](./PLAN.md) for the full concept and build plan.
+See [`PLAN.md`](./PLAN.md) for the full concept and build plan, and [`VIEWS.md`](./VIEWS.md)
+for the view-by-view UX spec the UI is built from.
+
+## Running the showcase
+
+Built with **Next.js (App Router) + TypeScript + Tailwind**. Inference is a **deterministic
+mock** — the server returns a synthetic clinical case stamped with the serving region and a
+cryptographic audit hash, making **zero external calls** by construction (that is the
+sovereignty guarantee, not an implementation detail).
+
+```bash
+npm install
+npm run dev        # http://localhost:3000
+```
+
+Other scripts:
+
+```bash
+npm run build      # production build
+npm run typecheck  # tsc --noEmit
+npm run lint       # eslint
+npm test           # vitest (unit + sovereignty property checks)
+npm run e2e        # playwright (demo flow + audit trail)
+```
+
+### The demo flow
+
+1. **Landing** (`/`) — the concept + an Enclave-vs-hyperscaler contrast. Click **Enter the demo**.
+2. **Workspace** (`/workspace`) — load the sample case and **Analyze in-region**.
+3. **Result** (`/workspace/result`) — clinical output on the left; the **residency panel**
+   (the money shot) on the right: *Processed in Johannesburg · Data never left South Africa ·
+   Egress: none*, plus a `0 external API calls` counter and an audit stamp.
+4. **Audit Trail** (`/audit`) — every PHI access attributed to an in-country operator.
+5. **Settings** (`/settings`) — flip the **region toggle**; the residency bar re-pins live.
+
+Toggle light/dark from the residency bar. All PHI in the showcase is **synthetic and
+de-identified**.
