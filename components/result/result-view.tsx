@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import type { AnalysisResult } from "@/lib/types";
 import { useRegion } from "@/components/shell/region-provider";
-import { Button } from "@/components/ui/button";
+import { buttonClasses } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProcessingState } from "./processing-state";
 import { ClinicalOutput } from "./clinical-output";
@@ -17,10 +17,17 @@ export function ResultView() {
   const { region } = useRegion();
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [failed, setFailed] = useState(false);
+  const started = useRef(false);
 
   useEffect(() => {
-    let active = true;
-    const started = Date.now();
+    // The ref guard makes a single visit fire exactly one analysis, even under
+    // React StrictMode's double-invoked effect. We deliberately do NOT tear the
+    // request down on cleanup: StrictMode's simulated unmount would otherwise
+    // cancel the only in-flight fetch and the result would never render.
+    if (started.current) return;
+    started.current = true;
+
+    const startedAt = Date.now();
     fetch("/api/analyze", { method: "POST" })
       .then((r) => {
         if (!r.ok) throw new Error(`analyze failed: ${r.status}`);
@@ -28,17 +35,10 @@ export function ResultView() {
       })
       .then((data: AnalysisResult) => {
         // Hold the processing beat briefly so the demo reads clearly.
-        const wait = Math.max(0, 1400 - (Date.now() - started));
-        setTimeout(() => {
-          if (active) setResult(data);
-        }, wait);
+        const wait = Math.max(0, 1400 - (Date.now() - startedAt));
+        setTimeout(() => setResult(data), wait);
       })
-      .catch(() => {
-        if (active) setFailed(true);
-      });
-    return () => {
-      active = false;
-    };
+      .catch(() => setFailed(true));
   }, []);
 
   if (failed) {
@@ -54,8 +54,8 @@ export function ResultView() {
               No data left {region.city} — nothing was processed. Start the analysis again.
             </p>
           </div>
-          <Link href="/workspace">
-            <Button variant="secondary">Back to workspace</Button>
+          <Link href="/workspace" className={buttonClasses("secondary")}>
+            Back to workspace
           </Link>
         </Card>
       </div>
@@ -65,7 +65,7 @@ export function ResultView() {
   if (!result) return <ProcessingState regionCity={region.city} />;
 
   return (
-    <div className="flex flex-col gap-6 p-8 lg:flex-row">
+    <div className="flex flex-col gap-6 p-4 sm:p-8 lg:flex-row">
       <ClinicalOutput result={result} />
       <ResidencyPanel residency={result.residency} />
     </div>
