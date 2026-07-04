@@ -92,8 +92,11 @@ export interface AuditEntry {
   regionId: string;
   /** The guarantee — always "none". */
   egress: "none";
-  /** Truncated audit hash for the table, e.g. "9f2a1c…c71b". */
+  /** Truncated chained hash for the table, e.g. "9f2a1c…c71b". */
   hash: string;
+  /** Full 64-hex chained digest: sha256(prevFullHash | this entry's fields).
+   *  Chaining makes the log tamper-evident and independently verifiable. */
+  fullHash: string;
 }
 
 export interface AuditSummary {

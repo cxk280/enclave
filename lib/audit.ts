@@ -1,81 +1,107 @@
+import { createHash } from "node:crypto";
 import type { ActionType, AuditEntry, AuditSummary } from "./types";
+import { shortHash } from "./hash";
 import { OPERATORS } from "./sample-case";
 
 /**
- * In-memory, in-process audit log for the showcase. Seeded with deterministic
- * synthetic rows; new analyses append here. Every entry is attributed to an
- * in-country operator and always records `egress: "none"`.
+ * In-memory, in-process, HASH-CHAINED audit log for the showcase.
  *
- * NOTE: this store is per-process and resets on restart — fine for a demo, but
- * a production deployment would back it with a region-locked, append-only store
- * (e.g. encrypted Object Storage). Called out in the PR description.
+ * Every entry's `fullHash` is a real SHA-256 over the *previous* entry's hash
+ * plus this entry's fields, so the log is append-only and tamper-evident:
+ * altering or dropping any row breaks every subsequent hash. `verifyAuditChain`
+ * recomputes the whole chain from genesis — the "cryptographic audit stamp" is
+ * therefore verifiable, not decorative.
+ *
+ * NOTE: this store is per-process and resets on restart — fine for a demo. A
+ * production deployment would persist it to a region-locked, WORM/append-only,
+ * signed store (see PLAN.md "target architecture"). See PR notes.
  */
+
+const GENESIS = "0".repeat(64);
 
 let counter = 0;
 const nextId = () => `ae-${(++counter).toString().padStart(4, "0")}`;
 
 function timeOf(iso: string): string {
-  // "2026-07-04T12:41:07" -> "12:41:07"
-  return iso.slice(11, 19);
+  return iso.slice(11, 19); // "2026-07-04T12:41:07" -> "12:41:07"
 }
 
-function seed(
-  timestamp: string,
-  operator: string,
-  action: ActionType,
-  subjectId: string,
-  hash: string,
-): AuditEntry {
-  return {
-    id: nextId(),
-    timestamp,
-    time: timeOf(timestamp),
-    operator,
-    action,
-    subjectId,
-    regionId: "af-south-1",
-    egress: "none",
-    hash,
-  };
-}
-
-const store: AuditEntry[] = [
-  seed("2026-07-04T12:41:07", "N. Dlamini", "inference", "SUBJ-4471", "9f2a1c…c71b"),
-  seed("2026-07-04T12:41:05", "N. Dlamini", "upload", "SUBJ-4471", "3b8e77…a12f"),
-  seed("2026-07-04T12:39:22", "T. Botha", "view", "SUBJ-4470", "c14d90…88ee"),
-  seed("2026-07-04T12:38:11", "A. Naidoo", "inference", "SUBJ-4469", "77aa02…4c31"),
-  seed("2026-07-04T12:35:48", "S. Pillay", "view", "SUBJ-4468", "e7b4c1…0d9a"),
-  seed("2026-07-04T12:33:10", "M. Khumalo", "upload", "SUBJ-4467", "1f0a55…b7c2"),
-  seed("2026-07-04T12:31:59", "L. van Wyk", "inference", "SUBJ-4466", "aa93ee…2210"),
-];
-
-/** Base count so the headline reads realistically ("~1,248 accesses"). */
-const BASE_ACCESSES = 1241;
-
-export function listAuditEntries(): AuditEntry[] {
-  return [...store].sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-}
-
-export function addAuditEntry(input: {
+type ChainInput = {
   timestamp: string;
   operator: string;
   action: ActionType;
   subjectId: string;
   regionId: string;
-  hash: string;
-}): AuditEntry {
+};
+
+function chainHash(prevFullHash: string, e: ChainInput): string {
+  return createHash("sha256")
+    .update(
+      [prevFullHash, e.timestamp, e.operator, e.action, e.subjectId, e.regionId].join("|"),
+    )
+    .digest("hex");
+}
+
+// --- Deterministic synthetic seed (real chained hashes, no fabricated counts) ---
+
+const ACTIONS: ActionType[] = ["inference", "upload", "view"];
+const pad = (n: number) => String(n).padStart(2, "0");
+
+function secToTime(s: number): string {
+  return `${pad(Math.floor(s / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`;
+}
+
+function isoAt(dayOffset: number, sec: number): string {
+  // Base day 2026-07-04 (UTC math is deterministic — no Date.now()).
+  const d = new Date(Date.UTC(2026, 6, 4) - dayOffset * 86_400_000);
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${secToTime(sec)}`;
+}
+
+const SEED_COUNT = 42;
+
+/** Newest-first synthetic accesses; each is a genuine event, not a counter. */
+const seedInputs: ChainInput[] = Array.from({ length: SEED_COUNT }, (_, i) => {
+  const dayOffset = Math.floor(i / 6);
+  const sec = Math.max(0, 45_667 - (i % 6) * 1_370 - dayOffset * 11);
+  return {
+    timestamp: isoAt(dayOffset, sec),
+    operator: OPERATORS[i % OPERATORS.length],
+    action: ACTIONS[i % ACTIONS.length],
+    subjectId: `SUBJ-${4471 - Math.floor(i / 2)}`,
+    regionId: "af-south-1",
+  };
+});
+
+// Chain oldest-first so each hash covers the prior one; store stays ascending.
+const store: AuditEntry[] = [];
+let headHash = GENESIS;
+for (const input of [...seedInputs].reverse()) {
+  headHash = chainHash(headHash, input);
+  store.push({
+    id: nextId(),
+    ...input,
+    time: timeOf(input.timestamp),
+    egress: "none",
+    hash: shortHash(headHash),
+    fullHash: headHash,
+  });
+}
+
+export function listAuditEntries(): AuditEntry[] {
+  return [...store].sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+}
+
+export function addAuditEntry(input: ChainInput): AuditEntry {
+  headHash = chainHash(headHash, input);
   const entry: AuditEntry = {
     id: nextId(),
-    timestamp: input.timestamp,
+    ...input,
     time: timeOf(input.timestamp),
-    operator: input.operator,
-    action: input.action,
-    subjectId: input.subjectId,
-    regionId: input.regionId,
     egress: "none",
-    hash: input.hash,
+    hash: shortHash(headHash),
+    fullHash: headHash,
   };
-  store.unshift(entry);
+  store.push(entry);
   return entry;
 }
 
@@ -84,19 +110,27 @@ export function recordAnalysis(input: {
   timestamp: string;
   subjectId: string;
   regionId: string;
-  hash: string;
 }): void {
   addAuditEntry({ ...input, operator: OPERATORS[0], action: "upload" });
   addAuditEntry({ ...input, operator: OPERATORS[0], action: "inference" });
 }
 
+/** Recompute the chain from genesis; false if any row was altered/removed. */
+export function verifyAuditChain(): boolean {
+  let prev = GENESIS;
+  for (const e of store) {
+    prev = chainHash(prev, e);
+    if (prev !== e.fullHash) return false;
+  }
+  return true;
+}
+
 export function getAuditSummary(): AuditSummary {
-  const regions = new Set(store.map((e) => e.regionId));
   return {
-    totalAccesses: BASE_ACCESSES + store.length,
-    distinctOperators: OPERATORS.length,
-    egressEvents: 0,
-    regionsTouched: regions.size,
+    totalAccesses: store.length,
+    distinctOperators: new Set(store.map((e) => e.operator)).size,
+    egressEvents: store.filter((e) => e.egress !== "none").length,
+    regionsTouched: new Set(store.map((e) => e.regionId)).size,
     regionId: "af-south-1",
     regionCity: "Johannesburg",
   };

@@ -19,8 +19,14 @@ const COLUMNS = [
   "AUDIT HASH",
 ] as const;
 
-/** Read-only table of every PHI access, attributed to an in-country operator. */
-export function AuditTable({ entries }: { entries: AuditEntry[] }) {
+/** Read-only table of PHI accesses, attributed to in-country operators. */
+export function AuditTable({
+  entries,
+  total,
+}: {
+  entries: AuditEntry[];
+  total?: number;
+}) {
   return (
     <Card className="overflow-hidden">
       <div className="overflow-x-auto">
@@ -71,7 +77,9 @@ export function AuditTable({ entries }: { entries: AuditEntry[] }) {
                   </div>
                 </td>
                 <td className="px-4 py-3 align-middle">
-                  <Pill tone="green">none</Pill>
+                  <Pill tone={entry.egress === "none" ? "green" : "danger"}>
+                    {entry.egress}
+                  </Pill>
                 </td>
                 <td className="px-4 py-3 align-middle">
                   <span className="font-mono text-[13px] text-ink-muted">{entry.hash}</span>
@@ -81,6 +89,12 @@ export function AuditTable({ entries }: { entries: AuditEntry[] }) {
           </tbody>
         </table>
       </div>
+      {total !== undefined && total > entries.length && (
+        <div className="border-t border-border-subtle px-4 py-3 text-[13px] text-ink-muted">
+          Showing the {entries.length} most recent of {total.toLocaleString()} accesses ·
+          export for the full region-locked log.
+        </div>
+      )}
     </Card>
   );
 }
