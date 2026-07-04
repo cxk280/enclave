@@ -62,3 +62,37 @@ npm run e2e        # playwright (demo flow + audit trail)
 
 Toggle light/dark from the residency bar. All PHI in the showcase is **synthetic and
 de-identified**.
+
+## Sovereignty controls (enforced, not just displayed)
+
+The demo backs its on-screen claims with real controls so a skeptical viewer can't catch
+the code contradicting the UI:
+
+- **Egress is enforced, not asserted.** A strict `Content-Security-Policy` with
+  `connect-src 'self'` (see `next.config.mjs`) blocks any fetch/XHR/WebSocket to a
+  third-party host at the browser level — so `Egress: none` is a control, not copy.
+- **Air-gapped build.** Fonts are **vendored locally** (`app/fonts/`, via `next/font/local`)
+  and Next.js **telemetry is disabled** in every script — the build/serve pipeline reaches
+  no external host.
+- **Tamper-evident audit trail.** Entries are **hash-chained** (`lib/audit.ts`): each
+  `fullHash` is a real SHA-256 over the previous entry plus its own fields, and
+  `verifyAuditChain()` recomputes the chain from genesis. No fabricated hashes or counts —
+  the summary reflects the real logged events. **Export for regulator** downloads the
+  full log as JSON.
+
+## Target architecture vs. what actually runs
+
+This is a **showcase**. Several sovereignty properties are *demonstrated* in the UX but would
+need real infrastructure to be load-bearing in production:
+
+| Shown in the demo | Production would require |
+|---|---|
+| In-memory hash-chained audit log | Region-locked, WORM/append-only, **signed** store (encrypted Object Storage) |
+| Self-asserted residency stamp | **Platform attestation** (signed control-plane statement / TEE quote) the workload can't forge |
+| "National staff" attribution, "Enforced" policy badges | Real IAM + nationality-verified operator identity behind each control |
+| Faux "Enter the demo" entry | Real authN/authZ on every route and API |
+| Client cookie region toggle | **Server-side**, contract/tenant-policy-bound residency routing |
+
+Reusing this repo's marketing language ("legally-defensible", "provably", "Enforced") in an
+actual customer/RFP claim is a question for data-localization counsel (POPIA and the other
+jurisdictions in `PLAN.md`), not demo copy.
