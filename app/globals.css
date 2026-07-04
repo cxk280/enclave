@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Enclave design tokens — mirrors the approved Figma variable collection.
+ * Clinical / calm / high-contrast. A single trustworthy green is the
+ * sovereign accent; amber/red are reserved for the hyperscaler-contrast path.
+ */
+:root {
+  --canvas: #f4f7f5;
+  --surface: #ffffff;
+  --surface-2: #edf2f0;
+  --nav: #ffffff;
+  --border-subtle: #e5eae7;
+  --border-strong: #d2dad6;
+
+  --ink: #0f1a17;
+  --ink-secondary: #4a5551;
+  --ink-muted: #7a857f;
+
+  --green: #0e8a5f;
+  --green-bg: #e1f3ea;
+  --green-text: #0a6b4a;
+  --green-border: #b7e4ce;
+
+  --heartbeat: #14b877;
+  --amber: #b7791f;
+  --amber-bg: #fbf0da;
+  --red: #c0392b;
+  --red-bg: #f9e4e1;
+  --track: #dce4e0;
+}
+
+.dark {
+  --canvas: #0b1310;
+  --surface: #131f1b;
+  --surface-2: #1a2822;
+  --nav: #0e1815;
+  --border-subtle: #24322d;
+  --border-strong: #33453e;
+
+  --ink: #eaf1ee;
+  --ink-secondary: #a7b4af;
+  --ink-muted: #71807a;
+
+  --green: #25c089;
+  --green-bg: #123028;
+  --green-text: #5be3ad;
+  --green-border: #1e5142;
+
+  --heartbeat: #24e39b;
+  --amber: #e0a94a;
+  --amber-bg: #3a2e14;
+  --red: #e86a5a;
+  --red-bg: #3a1e1a;
+  --track: #26332e;
+}
+
+* {
+  border-color: var(--border-subtle);
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Small-caps label helper used across residency/audit surfaces. */
+.eyebrow {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Shimmer used on loading skeletons. */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--surface-2) 60%, transparent),
+    transparent
+  );
+  animation: shimmer 1.6s infinite;
+}

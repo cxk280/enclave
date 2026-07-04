@@ -16,6 +16,13 @@ dist/
 build/
 .next/
 out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Testing
+coverage/
+playwright-report/
+test-results/
 
 # OS / editor
 .DS_Store
