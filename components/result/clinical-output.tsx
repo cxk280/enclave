@@ -96,6 +96,7 @@ export function ClinicalOutput({ result }: { result: AnalysisResult }) {
                 <ConfidenceBar
                   value={f.confidence}
                   tone={f.kind === "negative" ? "green" : "amber"}
+                  label={`${f.label}, confidence ${Math.round(f.confidence * 100)} percent`}
                 />
               </div>
             ))}
