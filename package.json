@@ -4,9 +4,9 @@
   "private": true,
   "description": "Enclave — sovereign clinical AI showcase (Vultr Sovereign Cloud + in-region GPU).",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "NEXT_TELEMETRY_DISABLED=1 next dev",
+    "build": "NEXT_TELEMETRY_DISABLED=1 next build",
+    "start": "NEXT_TELEMETRY_DISABLED=1 next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

@@ -1,20 +1,24 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/theme-provider";
 import { RegionProvider } from "@/components/shell/region-provider";
 import { getServingRegion } from "@/lib/regions.server";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
+// Fonts are vendored locally (app/fonts) and self-hosted — the build reaches no
+// external CDN, keeping the whole pipeline consistent with the air-gapped claim.
+const inter = localFont({
+  src: "./fonts/inter-latin.woff2",
   variable: "--font-inter",
   display: "swap",
+  weight: "100 900",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
+const jetbrainsMono = localFont({
+  src: "./fonts/jetbrains-mono-latin.woff2",
   variable: "--font-mono",
   display: "swap",
+  weight: "100 800",
 });
 
 export const metadata: Metadata = {

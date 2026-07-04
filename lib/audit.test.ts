@@ -3,6 +3,7 @@ import {
   getAuditSummary,
   listAuditEntries,
   recordAnalysis,
+  verifyAuditChain,
 } from "./audit";
 
 describe("audit trail", () => {
@@ -20,13 +21,24 @@ describe("audit trail", () => {
     }
   });
 
+  it("has real hashes (not fabricated) and a valid, tamper-evident chain", () => {
+    expect(verifyAuditChain()).toBe(true);
+    for (const e of listAuditEntries()) {
+      expect(e.fullHash).toMatch(/^[0-9a-f]{64}$/);
+    }
+  });
+
+  it("summary count reflects the real logged events, with no fabricated baseline", () => {
+    const summary = getAuditSummary();
+    expect(summary.totalAccesses).toBe(listAuditEntries().length);
+  });
+
   it("records an upload + inference pair on analysis, attributed to an operator", () => {
     const before = listAuditEntries().length;
     recordAnalysis({
       timestamp: "2026-07-04T13:00:00",
       subjectId: "SUBJ-9999",
       regionId: "af-south-1",
-      hash: "abc123…d4",
     });
     const after = listAuditEntries();
     expect(after.length).toBe(before + 2);
@@ -38,5 +50,7 @@ describe("audit trail", () => {
         .sort(),
     ).toEqual(["inference", "upload"]);
     expect(after[0].operator).toBeTruthy();
+    // the chain is still valid after appending
+    expect(verifyAuditChain()).toBe(true);
   });
 });

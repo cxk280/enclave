@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { getServingRegion } from "@/lib/regions.server";
 import { runInference } from "@/lib/mock-inference";
 import { recordAnalysis } from "@/lib/audit";
-import { shortHash } from "@/lib/hash";
 
 /**
  * POST /api/analyze — run in-region inference on the current serving region and
- * append the resulting access to the audit trail. Makes no external calls; the
- * response always carries `egress: "none"` and `externalCalls: 0`.
+ * append the resulting access to the tamper-evident audit trail. Makes no
+ * external calls; the response always carries `egress: "none"` and
+ * `externalCalls: 0`.
  */
 export async function POST() {
   const region = await getServingRegion();
@@ -17,7 +17,6 @@ export async function POST() {
     timestamp: result.residency.timestamp,
     subjectId: result.subjectId,
     regionId: region.id,
-    hash: shortHash(result.residency.auditHash),
   });
 
   return NextResponse.json(result);

@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { ChevronDown, Download, Search } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 import { AuditTable } from "@/components/audit/audit-table";
+import { ExportAudit } from "@/components/audit/export-button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { StatTile } from "@/components/ui/stat-tile";
 import { getAuditSummary, listAuditEntries } from "@/lib/audit";
@@ -9,6 +9,7 @@ const FILTERS = ["Region: af-south-1", "Operator: all", "Action: all", "Last 30 
 
 export default function AuditPage() {
   const entries = listAuditEntries();
+  const recent = entries.slice(0, 12);
   const summary = getAuditSummary();
 
   return (
@@ -21,13 +22,7 @@ export default function AuditPage() {
             Every PHI access, attributed to an in-country operator. Hand this to the regulator.
           </p>
         </div>
-        <Link
-          href="#"
-          className="inline-flex items-center gap-2 rounded-md border border-border-strong bg-surface px-4 py-3 text-[15px] font-semibold text-ink hover:bg-surface-2"
-        >
-          <Download size={18} />
-          Export for regulator
-        </Link>
+        <ExportAudit />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -75,7 +70,7 @@ export default function AuditPage() {
         ))}
       </div>
 
-      <AuditTable entries={entries} />
+      <AuditTable entries={recent} total={entries.length} />
     </div>
   );
 }
