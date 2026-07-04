@@ -20,7 +20,7 @@ export default function LandingPage() {
         <Wordmark />
         <div className="flex items-center gap-6">
           <Link
-            href="#"
+            href="#difference"
             className="text-[15px] font-semibold text-ink-secondary hover:text-ink"
           >
             How it works
@@ -81,7 +81,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="mx-auto flex max-w-[1120px] flex-col gap-7 px-10 pb-24 pt-6">
+      <section
+        id="difference"
+        className="mx-auto flex max-w-[1120px] flex-col gap-7 px-10 pb-24 pt-6 scroll-mt-8"
+      >
         <div className="flex flex-col items-center gap-2">
           <Eyebrow tone="green" className="text-center">
             The difference
