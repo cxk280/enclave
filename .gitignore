@@ -40,3 +40,6 @@ docs/USER_PERSONAS_FINDING.md
 # Vultr deploy state (never commit)
 scripts/vultr/.instance-id
 .vultr*.env
+
+# Persisted audit log (dev, when ENCLAVE_AUDIT_DIR is set)
+.data/
