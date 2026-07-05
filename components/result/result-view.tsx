@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, FileSearch } from "lucide-react";
 import type { AnalysisResult } from "@/lib/types";
 import { useRegion } from "@/components/shell/region-provider";
 import { buttonClasses } from "@/components/ui/button";
@@ -22,6 +22,7 @@ export function ResultView() {
   const { region } = useRegion();
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [failed, setFailed] = useState(false);
+  const [needsAnalysis, setNeedsAnalysis] = useState(false);
   const started = useRef(false);
 
   useEffect(() => {
@@ -34,14 +35,16 @@ export function ResultView() {
 
     // Arriving via the Workspace "Analyze" link (?fresh=1) forces a brand-new
     // analysis; strip the param so a later refresh re-displays (not re-runs) it.
-    if (new URLSearchParams(window.location.search).get("fresh") === "1") {
+    const isFresh =
+      new URLSearchParams(window.location.search).get("fresh") === "1";
+    if (isFresh) {
       sessionStorage.removeItem(RESULT_CACHE_KEY);
       window.history.replaceState(null, "", "/workspace/result");
     }
 
     // A refresh / back-nav re-displays the cached analysis — no new inference,
-    // no new audit rows. Only a fresh "Analyze" (which clears the cache) re-runs.
-    const cached = sessionStorage.getItem(RESULT_CACHE_KEY);
+    // no new audit rows.
+    const cached = isFresh ? null : sessionStorage.getItem(RESULT_CACHE_KEY);
     if (cached) {
       try {
         setResult(JSON.parse(cached) as AnalysisResult);
@@ -49,6 +52,14 @@ export function ResultView() {
       } catch {
         sessionStorage.removeItem(RESULT_CACHE_KEY);
       }
+    }
+
+    // A cold visit (no prior analysis, no explicit Analyze) must NOT silently
+    // run and log a PHI access — the audit trail only records deliberate
+    // analyses. Prompt the user to start one instead.
+    if (!isFresh) {
+      setNeedsAnalysis(true);
+      return;
     }
 
     const startedAt = Date.now();
@@ -65,6 +76,26 @@ export function ResultView() {
       })
       .catch(() => setFailed(true));
   }, []);
+
+  if (needsAnalysis) {
+    return (
+      <div className="flex flex-1 items-center justify-center p-10">
+        <Card className="flex max-w-[440px] flex-col items-center gap-4 p-9 text-center">
+          <FileSearch size={32} className="text-green" />
+          <div>
+            <h2 className="text-[18px] font-semibold text-ink">No analysis yet</h2>
+            <p className="mt-1 text-[14px] text-ink-secondary">
+              Results are generated in-region when you run an analysis — opening this
+              page on its own doesn&apos;t access any data.
+            </p>
+          </div>
+          <Link href="/workspace" className={buttonClasses("primary")}>
+            Start an analysis
+          </Link>
+        </Card>
+      </div>
+    );
+  }
 
   if (failed) {
     return (
