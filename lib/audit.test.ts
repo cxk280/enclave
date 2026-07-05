@@ -8,6 +8,13 @@ import {
 } from "./audit";
 
 describe("audit trail", () => {
+  it("seeds UTC-qualified timestamps so region-local rendering is machine-independent", () => {
+    // Runs before any test injects rows, so this is the pristine seed set.
+    for (const e of listAuditEntries()) {
+      expect(e.timestamp.endsWith("Z")).toBe(true);
+    }
+  });
+
   it("orders entries newest-first", () => {
     const entries = listAuditEntries();
     for (let i = 1; i < entries.length; i++) {
@@ -32,6 +39,13 @@ describe("audit trail", () => {
   it("summary count reflects the real logged events, with no fabricated baseline", () => {
     const summary = getAuditSummary();
     expect(summary.totalAccesses).toBe(listAuditEntries().length);
+  });
+
+  it("regions-touched enumerates the real distinct regions, matching the count", () => {
+    const summary = getAuditSummary();
+    const distinct = [...new Set(listAuditEntries().map((e) => e.regionId))].sort();
+    expect(summary.regions).toEqual(distinct);
+    expect(summary.regionsTouched).toBe(distinct.length);
   });
 
   it("records an upload + inference pair on analysis, attributed to an operator", () => {
