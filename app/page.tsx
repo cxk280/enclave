@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Wordmark } from "@/components/shell/wordmark";
-import { Button, buttonClasses } from "@/components/ui/button";
+import { buttonClasses } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Pill } from "@/components/ui/pill";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -61,7 +61,9 @@ export default function LandingPage() {
           <Link href="/workspace" className={buttonClasses("primary")}>
             Enter the demo <ArrowRight size={18} />
           </Link>
-          <Button variant="secondary">See the guarantee</Button>
+          <Link href="#difference" className={buttonClasses("secondary")}>
+            See the guarantee
+          </Link>
         </div>
 
         <div className="flex items-center gap-2 text-[13px] text-ink-muted">

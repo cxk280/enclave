@@ -21,27 +21,33 @@ function DropZone({
   icon: Icon,
   title,
   hint,
-  format,
   loadedText,
+  onSelect,
 }: {
   icon: LucideIcon;
   title: string;
   hint: string;
-  format: string;
   loadedText?: string;
+  onSelect: () => void;
 }) {
+  const loaded = !!loadedText;
   return (
-    <div
+    <button
+      type="button"
+      onClick={onSelect}
+      aria-pressed={loaded}
       className={cn(
         "flex flex-1 flex-col items-center gap-3.5 rounded-lg border-[1.5px] border-dashed p-9 text-center transition",
-        loadedText ? "border-green-border bg-green-bg/40" : "border-border-strong bg-surface",
+        loaded
+          ? "border-green-border bg-green-bg/40"
+          : "cursor-pointer border-border-strong bg-surface hover:border-green-border hover:bg-surface-2",
       )}
     >
       <span className="flex h-[52px] w-[52px] items-center justify-center rounded-[12px] bg-green-bg text-green">
         <Icon size={26} strokeWidth={2} />
       </span>
       <div className="text-[18px] font-semibold text-ink">{title}</div>
-      {loadedText ? (
+      {loaded ? (
         <p className="line-clamp-2 max-w-[260px] text-[13px] text-ink-secondary">{loadedText}</p>
       ) : (
         <p className="max-w-[240px] text-[13px] text-ink-muted">{hint}</p>
@@ -50,8 +56,10 @@ function DropZone({
         <ShieldCheck size={12} />
         De-identified / synthetic PHI only
       </span>
-      <span className="text-[13px] text-ink-muted">{loadedText ? "Sample loaded" : format}</span>
-    </div>
+      <span className="text-[13px] text-ink-muted">
+        {loaded ? "Sample loaded" : "Click to load the sample case"}
+      </span>
+    </button>
   );
 }
 
@@ -66,7 +74,8 @@ export default function WorkspacePage() {
           <Eyebrow tone="green">New analysis</Eyebrow>
           <h1 className="mt-1.5 text-[30px] font-bold text-ink">Start a new analysis</h1>
           <p className="mt-2 text-[16px] text-ink-secondary">
-            Upload a clinical note and a medical image to run inference entirely in-region.
+            Load the sample case to run inference entirely in-region — de-identified,
+            synthetic data only.
           </p>
         </header>
 
@@ -74,16 +83,16 @@ export default function WorkspacePage() {
           <DropZone
             icon={FileText}
             title="Clinical note"
-            hint="Paste text or drop a plain-text note"
-            format=".txt · paste supported"
+            hint="A de-identified, synthetic progress note"
             loadedText={loaded ? SAMPLE_CASE.noteText : undefined}
+            onSelect={() => setLoaded(true)}
           />
           <DropZone
             icon={ImageIcon}
             title="Medical image"
-            hint="Drop a chest X-ray to triage"
-            format=".png · .jpg · .dcm"
+            hint="A synthetic PA chest X-ray to triage"
             loadedText={loaded ? "PA chest X-ray · synthetic" : undefined}
+            onSelect={() => setLoaded(true)}
           />
         </div>
 

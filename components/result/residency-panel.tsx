@@ -123,9 +123,9 @@ export function ResidencyPanel({ residency }: { residency: ResidencyStamp }) {
             Egress risk
           </Pill>
           <p className="text-[13px] leading-5 text-ink-secondary">
-            Your PHI would traverse a cross-border egress path to a control plane
-            hosted outside the jurisdiction, administered by foreign support staff
-            — which is exactly what hard data-localization law forbids.
+            With a typical hyperscaler, PHI would traverse a cross-border egress path
+            to a control plane hosted outside the jurisdiction, administered by foreign
+            support staff — the pattern hard data-localization law is designed to prevent.
           </p>
         </div>
       </details>
