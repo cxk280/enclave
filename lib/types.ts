@@ -18,12 +18,47 @@ export interface Region {
   countryCode: string;
   /** Emoji flag for at-a-glance region identity. */
   flag: string;
-  /** Serving GPU class in-region. */
+  /** Serving GPU class in-region — the production-target spec (this showcase
+   *  box is CPU-only; the real node identity is surfaced separately). */
   gpu: string;
+  /** IANA timezone for the region, e.g. "Africa/Johannesburg". Used to render
+   *  residency timestamps in the region's own local time. */
+  timezone: string;
+  /** Nominal in-region round-trip latency (ms). The result view shows the
+   *  *measured* inference latency; this is the at-a-glance regional figure. */
   latencyMs: number;
   status: "active" | "available";
   /** One-line human summary shown in the region toggle. */
   note: string;
+}
+
+/** Real, kernel-derived proof that inference made no external connections.
+ *  Measured (not asserted) by reading the process network namespace's open
+ *  TCP sockets; degrades to a clearly-flagged static assertion where the
+ *  Linux /proc interface is unavailable (e.g. local macOS dev). */
+export interface EgressProof {
+  /** Established outbound TCP connections to non-loopback hosts. 0 in-region. */
+  externalConnections: number;
+  /** How the number was obtained: "/proc/net/tcp" (real) or "static" (fallback). */
+  measuredVia: "/proc/net/tcp" | "static";
+  /** True when a real kernel measurement was taken (Linux); false on fallback. */
+  live: boolean;
+}
+
+/** Real identity of the serving node, probed from the host at request time. */
+export interface NodeInfo {
+  /** OS hostname of the sovereign node. */
+  host: string;
+  /** CPU model string, e.g. "AMD EPYC ...". */
+  cpu: string;
+  /** Logical CPU count. */
+  cpuCount: number;
+  /** Total memory in MB. */
+  memMb: number;
+  /** Process uptime in seconds. */
+  uptimeSeconds: number;
+  /** OS platform, e.g. "linux". */
+  platform: string;
 }
 
 /** The money-shot artifact: proof of where inference happened. */
@@ -31,16 +66,24 @@ export interface ResidencyStamp {
   regionId: string;
   regionCity: string;
   regionCountry: string;
+  /** Production-target GPU class (this showcase box is CPU-only — see `node`). */
   gpu: string;
+  /** Real serving node identity, probed from the host at inference time. */
+  node: NodeInfo;
   operator: string;
   /** The guarantee — always "none". */
   egress: "none";
-  /** The guarantee — always 0. */
+  /** The guarantee — always 0 (the app initiates no external calls). */
   externalCalls: 0;
+  /** Real kernel-measured proof backing the `externalCalls` guarantee. */
+  egressProof: EgressProof;
+  /** Measured wall-clock latency of this inference, in ms (real, not nominal). */
+  latencyMs: number;
   /** "sha256:…" cryptographic stamp over case + region + timestamp. */
   auditHash: string;
   /** ISO-8601 timestamp of inference. */
   timestamp: string;
+  /** IANA timezone of the serving region, e.g. "Africa/Johannesburg". */
   timezone: string;
 }
 
@@ -104,6 +147,11 @@ export interface AuditSummary {
   distinctOperators: number;
   egressEvents: number;
   regionsTouched: number;
+  /** The distinct region ids actually present in the log (for the "regions
+   *  touched" tile — so its label matches its count instead of naming only the
+   *  currently-pinned region). */
+  regions: string[];
+  /** The currently-serving region — used for the "no data left <region>" copy. */
   regionId: string;
   regionCity: string;
 }

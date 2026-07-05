@@ -3,6 +3,7 @@ import { ExportAudit } from "@/components/audit/export-button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { StatTile } from "@/components/ui/stat-tile";
 import { getAuditSummary, listAuditEntries } from "@/lib/audit";
+import { getServingRegion } from "@/lib/regions.server";
 
 export default async function AuditPage({
   searchParams,
@@ -10,8 +11,9 @@ export default async function AuditPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q } = await searchParams;
+  const region = await getServingRegion();
   const entries = listAuditEntries();
-  const summary = getAuditSummary();
+  const summary = getAuditSummary(region);
 
   return (
     <div className="flex flex-col gap-5 p-4 sm:p-8">
@@ -40,11 +42,16 @@ export default async function AuditPage({
           label="Distinct operators"
           sub="All in-country"
         />
-        <StatTile value="0" label="Egress events" sub="No data left af-south-1" accent />
+        <StatTile
+          value={String(summary.egressEvents)}
+          label="Egress events"
+          sub={`No data left ${summary.regionId}`}
+          accent
+        />
         <StatTile
           value={String(summary.regionsTouched)}
           label="Regions touched"
-          sub={`${summary.regionId} · ${summary.regionCity}`}
+          sub={summary.regions.join(" · ")}
         />
       </div>
 

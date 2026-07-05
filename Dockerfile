@@ -21,6 +21,9 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+# Region-locked, app-owned dir for the append-only audit log (persists across
+# container restarts; a redeploy intentionally starts a fresh trail).
+ENV ENCLAVE_AUDIT_DIR=/app/.data
 
 # Run as a non-root user.
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
@@ -29,6 +32,9 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+# Writable, non-root-owned dir for the persisted audit log.
+RUN mkdir -p /app/.data && chown nextjs:nodejs /app/.data
 
 USER nextjs
 EXPOSE 3000
