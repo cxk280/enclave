@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "description": "Enclave — sovereign clinical AI showcase (Vultr Sovereign Cloud + in-region GPU).",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "NEXT_TELEMETRY_DISABLED=1 next dev",
     "build": "NEXT_TELEMETRY_DISABLED=1 next build",
