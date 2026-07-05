@@ -18,7 +18,7 @@ export function LeftNav() {
   const { region } = useRegion();
 
   return (
-    <nav className="flex w-60 shrink-0 flex-col border-r border-border-subtle bg-nav p-3.5">
+    <nav className="hidden w-60 shrink-0 flex-col border-r border-border-subtle bg-nav p-3.5 lg:flex">
       <div className="px-2.5 pb-5 pt-1">
         <Wordmark />
       </div>

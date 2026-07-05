@@ -4,11 +4,14 @@ import { cn } from "@/lib/cn";
 export function ConfidenceBar({
   value,
   tone = "amber",
+  label,
   className,
 }: {
   /** 0..1 */
   value: number;
   tone?: "amber" | "green";
+  /** Accessible name tying the meter to its finding. */
+  label?: string;
   className?: string;
 }) {
   const pct = Math.max(0, Math.min(1, value)) * 100;
@@ -16,6 +19,7 @@ export function ConfidenceBar({
     <div
       className={cn("h-[7px] w-full overflow-hidden rounded-full bg-track", className)}
       role="progressbar"
+      aria-label={label}
       aria-valuenow={Math.round(pct)}
       aria-valuemin={0}
       aria-valuemax={100}

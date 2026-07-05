@@ -32,7 +32,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex justify-center p-8">
+    <div className="flex justify-center p-4 sm:p-8">
       <div className="flex w-full max-w-[920px] flex-col gap-5 py-4">
         {/* header */}
         <div>

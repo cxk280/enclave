@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Wordmark } from "@/components/shell/wordmark";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClasses } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Pill } from "@/components/ui/pill";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -16,7 +16,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="flex items-center justify-between border-b border-border-subtle px-10 py-5">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle px-4 py-4 sm:px-10 sm:py-5">
         <Wordmark />
         <div className="flex items-center gap-6">
           <Link
@@ -31,14 +31,14 @@ export default function LandingPage() {
           >
             Audit
           </Link>
-          <Link href="/workspace">
-            <Button>Enter the demo</Button>
+          <Link href="/workspace" className={buttonClasses("primary")}>
+            Enter the demo
           </Link>
           <ThemeToggle />
         </div>
       </header>
 
-      <section className="mx-auto flex max-w-[900px] flex-col items-center gap-6 px-10 py-20 text-center">
+      <section className="mx-auto flex max-w-[900px] flex-col items-center gap-6 px-4 py-16 text-center sm:px-10 sm:py-20">
         <span className="inline-flex items-center gap-2 rounded-full border border-green-border bg-green-bg px-3.5 py-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-green" />
           <span className="eyebrow text-green-text">
@@ -46,7 +46,7 @@ export default function LandingPage() {
           </span>
         </span>
 
-        <h1 className="text-[52px] font-bold leading-[1.1] tracking-tight text-ink">
+        <h1 className="text-[34px] font-bold leading-[1.1] tracking-tight text-ink sm:text-[52px]">
           Clinical AI that never leaves the country.
         </h1>
 
@@ -58,10 +58,8 @@ export default function LandingPage() {
         </p>
 
         <div className="flex gap-3">
-          <Link href="/workspace">
-            <Button>
-              Enter the demo <ArrowRight size={18} />
-            </Button>
+          <Link href="/workspace" className={buttonClasses("primary")}>
+            Enter the demo <ArrowRight size={18} />
           </Link>
           <Button variant="secondary">See the guarantee</Button>
         </div>
@@ -83,7 +81,7 @@ export default function LandingPage() {
 
       <section
         id="difference"
-        className="mx-auto flex max-w-[1120px] flex-col gap-7 px-10 pb-24 pt-6 scroll-mt-8"
+        className="mx-auto flex max-w-[1120px] flex-col gap-7 px-4 pb-24 pt-6 scroll-mt-8 sm:px-10"
       >
         <div className="flex flex-col items-center gap-2">
           <Eyebrow tone="green" className="text-center">
