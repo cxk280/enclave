@@ -23,6 +23,8 @@ const csp = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Emit a self-contained server bundle for a minimal container image.
+  output: "standalone",
   async headers() {
     return [
       {
