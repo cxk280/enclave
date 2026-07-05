@@ -56,6 +56,10 @@ No secrets, API keys, or external endpoints are required.
 
 ## Post-deploy smoke check
 ```bash
+scripts/smoke.sh https://<host>   # health, all routes, CSP, egress:none / 0 external calls
+```
+Or manually:
+```bash
 curl -fsS https://<host>/api/health         # {"status":"ok","region":"af-south-1"}
 curl -sI https://<host>/ | grep -i content-security-policy   # connect-src 'self' present
 ```
