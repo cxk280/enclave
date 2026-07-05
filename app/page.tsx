@@ -180,6 +180,15 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <footer className="border-t border-border-subtle px-4 py-6 sm:px-10">
+        <p className="mx-auto max-w-[1120px] text-[12px] leading-5 text-ink-muted">
+          A Vultr capability demonstration. All data is synthetic and de-identified.
+          The sovereignty properties shown illustrate the target Vultr Sovereign Cloud
+          architecture — they are not a compliance certification, and the copy here is
+          demonstration language, not a legal representation.
+        </p>
+      </footer>
     </div>
   );
 }
