@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import type { AuditEntry } from "@/lib/types";
 import { getRegionById } from "@/lib/regions";
+import { formatEntryClock, formatEntryDate } from "@/lib/format-time";
 import { Card } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
 
@@ -22,8 +23,6 @@ const COLUMNS = [
   "EGRESS",
   "AUDIT HASH",
 ] as const;
-
-const FILTERS = ["Region: af-south-1", "Operator: all", "Action: all", "Last 30 days"];
 
 const RECENT = 12;
 
@@ -63,16 +62,6 @@ export function AuditBrowser({
             className="w-full bg-transparent text-[15px] text-ink placeholder:text-ink-muted focus:outline-none"
           />
         </div>
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            type="button"
-            className="inline-flex items-center gap-2 rounded-md border border-border-strong bg-surface px-3.5 py-2.5 text-[15px] font-semibold text-ink hover:bg-surface-2"
-          >
-            {f}
-            <ChevronDown size={16} className="text-ink-muted" />
-          </button>
-        ))}
       </div>
 
       <Card className="overflow-hidden">
@@ -92,10 +81,10 @@ export function AuditBrowser({
                 <tr key={entry.id} className="border-t border-border-subtle">
                   <td className="px-4 py-3 align-middle">
                     <div className="font-mono text-[13px] leading-tight text-ink">
-                      {entry.time}
+                      {formatEntryClock(entry.timestamp, entry.regionId)}
                     </div>
                     <div className="font-mono text-[11px] text-ink-muted">
-                      {entry.timestamp.slice(0, 10)}
+                      {formatEntryDate(entry.timestamp, entry.regionId)}
                     </div>
                   </td>
                   <td className="px-4 py-3 align-middle">

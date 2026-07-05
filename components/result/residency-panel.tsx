@@ -3,7 +3,9 @@ import {
   ArrowRight,
   ChevronRight,
   Cpu,
+  Gauge,
   Hash,
+  Server,
   ShieldCheck,
   UserRound,
 } from "lucide-react";
@@ -12,6 +14,7 @@ import type { ResidencyStamp } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Pill } from "@/components/ui/pill";
+import { formatInRegionTime } from "@/lib/format-time";
 
 function MetaRow({
   icon: Icon,
@@ -41,7 +44,7 @@ function MetaRow({
 export function ResidencyPanel({ residency }: { residency: ResidencyStamp }) {
   const hex = residency.auditHash.replace(/^sha256:/, "");
   const stamp = `sha256:${hex.slice(0, 10)}… ${hex.slice(-6)}`;
-  const when = `${residency.timestamp.slice(0, 10)} ${residency.timestamp.slice(11, 19)} ${residency.timezone}`;
+  const when = formatInRegionTime(residency.timestamp, residency.timezone);
 
   return (
     <div className="flex w-full flex-col gap-3.5 lg:w-96">
@@ -67,22 +70,39 @@ export function ResidencyPanel({ residency }: { residency: ResidencyStamp }) {
 
       {/* attribution */}
       <Card className="flex flex-col">
-        <MetaRow icon={Cpu} label="Serving GPU" value={`${residency.regionId} · ${residency.gpu}`} first />
+        <MetaRow
+          icon={Cpu}
+          label="Compute · production target"
+          value={`${residency.regionId} · ${residency.gpu}`}
+          first
+        />
+        <MetaRow
+          icon={Server}
+          label="Serving node"
+          value={`${residency.node.host} · ${residency.node.cpuCount} vCPU`}
+        />
+        <MetaRow
+          icon={Gauge}
+          label="Inference latency"
+          value={`${residency.latencyMs} ms · measured in-region`}
+        />
         <MetaRow icon={UserRound} label="Control plane operator" value={residency.operator} />
         <MetaRow icon={ShieldCheck} label="Model weights" value="In-region · no external calls" />
       </Card>
 
-      {/* zero-egress counter */}
+      {/* zero-egress counter, backed by a real kernel measurement */}
       <Card className="flex items-center gap-3.5 p-[18px]">
         <span className="text-[30px] font-bold leading-none text-green">
           {residency.externalCalls}
         </span>
-        <div>
+        <div className="min-w-0">
           <div className="text-[15px] font-semibold text-ink">
             External API calls at inference
           </div>
           <div className="text-[13px] text-ink-muted">
-            Every token generated on sovereign hardware.
+            {residency.egressProof.live
+              ? `Kernel-confirmed: ${residency.egressProof.externalConnections} external TCP connections (/proc/net/tcp).`
+              : "Every token generated on sovereign hardware."}
           </div>
         </div>
       </Card>

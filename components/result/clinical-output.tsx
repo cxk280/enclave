@@ -1,5 +1,6 @@
 import { FileText, Image as ImageIcon, Tag } from "lucide-react";
 import type { AnalysisResult } from "@/lib/types";
+import { formatRegionClock } from "@/lib/format-time";
 import { Card } from "@/components/ui/card";
 import { CardHeader } from "@/components/ui/card-header";
 import { Chip } from "@/components/ui/chip";
@@ -19,7 +20,7 @@ export function ClinicalOutput({ result }: { result: AnalysisResult }) {
         <h1 className="mt-1.5 text-[22px] font-semibold text-ink">Analysis complete</h1>
         <p className="mt-1 text-[14px] text-ink-secondary">
           Synthetic case · 54 y/o · progress note + {result.imaging.modality} ·
-          analyzed {result.residency.timestamp.slice(11, 19)} {result.residency.timezone}
+          analyzed {formatRegionClock(result.residency.timestamp, result.residency.timezone)}
         </p>
       </header>
 

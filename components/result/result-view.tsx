@@ -121,9 +121,16 @@ export function ResultView() {
   if (!result) return <ProcessingState regionCity={region.city} />;
 
   return (
-    <div className="flex flex-col gap-6 p-4 sm:p-8 lg:flex-row">
-      <ClinicalOutput result={result} />
-      <ResidencyPanel residency={result.residency} />
+    <div className="flex flex-col gap-4 p-4 sm:p-8">
+      <div className="flex flex-col gap-6 lg:flex-row">
+        <ClinicalOutput result={result} />
+        <ResidencyPanel residency={result.residency} />
+      </div>
+      <p className="text-[12px] leading-5 text-ink-muted">
+        Demonstration · synthetic, de-identified data. The clinical result is a labeled mock;
+        the residency, serving-node, latency, and egress telemetry are measured live from the
+        node that served this request.
+      </p>
     </div>
   );
 }
