@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Check, Download } from "lucide-react";
 
 /** Downloads the full audit log (entries + summary) as JSON — the literal
@@ -8,8 +8,11 @@ import { Check, Download } from "lucide-react";
  *  data (no external call). Shows a brief confirmation after download. */
 export function ExportAudit() {
   const [exported, setExported] = useState(false);
+  const busy = useRef(false);
 
   async function onExport() {
+    if (busy.current) return; // guard against double-click → double download
+    busy.current = true;
     try {
       const res = await fetch("/api/audit");
       if (!res.ok) return;
@@ -27,6 +30,8 @@ export function ExportAudit() {
       setTimeout(() => setExported(false), 2500);
     } catch {
       // Same-origin export; nothing actionable in the demo if it fails.
+    } finally {
+      busy.current = false;
     }
   }
 
