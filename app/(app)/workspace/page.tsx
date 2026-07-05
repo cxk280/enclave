@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   ArrowRight,
   FileText,
@@ -11,9 +11,8 @@ import {
   Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClasses } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { RESULT_CACHE_KEY } from "@/components/result/result-view";
 import { useRegion } from "@/components/shell/region-provider";
 import { SAMPLE_CASE } from "@/lib/sample-case";
 import { cn } from "@/lib/cn";
@@ -57,7 +56,6 @@ function DropZone({
 }
 
 export default function WorkspacePage() {
-  const router = useRouter();
   const { region } = useRegion();
   const [loaded, setLoaded] = useState(false);
 
@@ -107,16 +105,15 @@ export default function WorkspacePage() {
             <Zap size={18} />
             Load sample case
           </Button>
-          <Button
-            onClick={() => {
-              // Start a genuinely new analysis (not a cached re-view).
-              sessionStorage.removeItem(RESULT_CACHE_KEY);
-              router.push("/workspace/result");
-            }}
+          {/* A real link so it works even before hydration (e.g. on slow 3G);
+              ?fresh=1 tells the result view to start a genuinely new analysis. */}
+          <Link
+            href="/workspace/result?fresh=1"
+            className={buttonClasses("primary")}
           >
             Analyze in-region
             <ArrowRight size={18} />
-          </Button>
+          </Link>
         </div>
       </div>
     </div>

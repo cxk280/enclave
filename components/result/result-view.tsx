@@ -32,6 +32,13 @@ export function ResultView() {
     if (started.current) return;
     started.current = true;
 
+    // Arriving via the Workspace "Analyze" link (?fresh=1) forces a brand-new
+    // analysis; strip the param so a later refresh re-displays (not re-runs) it.
+    if (new URLSearchParams(window.location.search).get("fresh") === "1") {
+      sessionStorage.removeItem(RESULT_CACHE_KEY);
+      window.history.replaceState(null, "", "/workspace/result");
+    }
+
     // A refresh / back-nav re-displays the cached analysis — no new inference,
     // no new audit rows. Only a fresh "Analyze" (which clears the cache) re-runs.
     const cached = sessionStorage.getItem(RESULT_CACHE_KEY);
