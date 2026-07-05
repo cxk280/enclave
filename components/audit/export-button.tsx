@@ -1,11 +1,14 @@
 "use client";
 
-import { Download } from "lucide-react";
+import { useState } from "react";
+import { Check, Download } from "lucide-react";
 
 /** Downloads the full audit log (entries + summary) as JSON — the literal
  *  "hand this to the regulator" artifact, generated in-region from same-origin
- *  data (no external call). */
+ *  data (no external call). Shows a brief confirmation after download. */
 export function ExportAudit() {
+  const [exported, setExported] = useState(false);
+
   async function onExport() {
     try {
       const res = await fetch("/api/audit");
@@ -20,6 +23,8 @@ export function ExportAudit() {
       a.download = "enclave-audit-af-south-1.json";
       a.click();
       URL.revokeObjectURL(url);
+      setExported(true);
+      setTimeout(() => setExported(false), 2500);
     } catch {
       // Same-origin export; nothing actionable in the demo if it fails.
     }
@@ -31,8 +36,17 @@ export function ExportAudit() {
       onClick={onExport}
       className="inline-flex items-center gap-2 rounded-md border border-border-strong bg-surface px-4 py-3 text-[15px] font-semibold text-ink hover:bg-surface-2"
     >
-      <Download size={18} />
-      Export for regulator
+      {exported ? (
+        <>
+          <Check size={18} className="text-green" />
+          Exported
+        </>
+      ) : (
+        <>
+          <Download size={18} />
+          Export for regulator
+        </>
+      )}
     </button>
   );
 }

@@ -11,6 +11,11 @@ import { ProcessingState } from "./processing-state";
 import { ClinicalOutput } from "./clinical-output";
 import { ResidencyPanel } from "./residency-panel";
 
+/** Session cache so a refresh/back-nav re-displays the SAME analysis instead of
+ *  re-running it (which would add phantom rows to the audit trail). Cleared by
+ *  the Workspace "Analyze in-region" action to start a genuinely new analysis. */
+export const RESULT_CACHE_KEY = "enclave:lastResult";
+
 /** Orchestrates the result view: run inference, show the in-region loading
  *  state, then reveal the clinical output + residency spotlight. */
 export function ResultView() {
@@ -27,6 +32,18 @@ export function ResultView() {
     if (started.current) return;
     started.current = true;
 
+    // A refresh / back-nav re-displays the cached analysis — no new inference,
+    // no new audit rows. Only a fresh "Analyze" (which clears the cache) re-runs.
+    const cached = sessionStorage.getItem(RESULT_CACHE_KEY);
+    if (cached) {
+      try {
+        setResult(JSON.parse(cached) as AnalysisResult);
+        return;
+      } catch {
+        sessionStorage.removeItem(RESULT_CACHE_KEY);
+      }
+    }
+
     const startedAt = Date.now();
     fetch("/api/analyze", { method: "POST" })
       .then((r) => {
@@ -34,6 +51,7 @@ export function ResultView() {
         return r.json();
       })
       .then((data: AnalysisResult) => {
+        sessionStorage.setItem(RESULT_CACHE_KEY, JSON.stringify(data));
         // Hold the processing beat briefly so the demo reads clearly.
         const wait = Math.max(0, 1400 - (Date.now() - startedAt));
         setTimeout(() => setResult(data), wait);

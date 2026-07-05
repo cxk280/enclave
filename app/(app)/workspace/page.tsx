@@ -13,6 +13,8 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
+import { RESULT_CACHE_KEY } from "@/components/result/result-view";
+import { useRegion } from "@/components/shell/region-provider";
 import { SAMPLE_CASE } from "@/lib/sample-case";
 import { cn } from "@/lib/cn";
 
@@ -56,6 +58,7 @@ function DropZone({
 
 export default function WorkspacePage() {
   const router = useRouter();
+  const { region } = useRegion();
   const [loaded, setLoaded] = useState(false);
 
   return (
@@ -93,7 +96,7 @@ export default function WorkspacePage() {
               Pinned in-region the moment you analyze.
             </p>
             <p className="mt-0.5 text-[13px] text-ink-secondary">
-              This case is pinned to Johannesburg (af-south-1). No copy is created outside
+              This case is pinned to {region.city} ({region.id}). No copy is created outside
               the sovereign region, and there is no egress path off the island.
             </p>
           </div>
@@ -104,7 +107,13 @@ export default function WorkspacePage() {
             <Zap size={18} />
             Load sample case
           </Button>
-          <Button onClick={() => router.push("/workspace/result")}>
+          <Button
+            onClick={() => {
+              // Start a genuinely new analysis (not a cached re-view).
+              sessionStorage.removeItem(RESULT_CACHE_KEY);
+              router.push("/workspace/result");
+            }}
+          >
             Analyze in-region
             <ArrowRight size={18} />
           </Button>

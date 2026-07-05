@@ -60,7 +60,7 @@ export function ClinicalOutput({ result }: { result: AnalysisResult }) {
               <span className="min-w-0 flex-1 text-[14px] text-ink">{c.label}</span>
               <span className="flex shrink-0 items-center gap-1.5 text-[13px] font-medium text-ink-secondary">
                 <span className="h-1.5 w-1.5 rounded-full bg-green" />
-                {c.confidence.toFixed(2)}
+                {Math.round(c.confidence * 100)}%
               </span>
             </div>
           ))}
@@ -90,7 +90,7 @@ export function ClinicalOutput({ result }: { result: AnalysisResult }) {
                   </span>
                   <span className="flex-1 text-[14px] text-ink">{f.label}</span>
                   <span className="text-[13px] font-medium text-ink-secondary">
-                    {f.confidence.toFixed(2)}
+                    {Math.round(f.confidence * 100)}%
                   </span>
                 </div>
                 <ConfidenceBar

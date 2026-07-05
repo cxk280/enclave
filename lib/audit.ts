@@ -115,14 +115,16 @@ export function addAuditEntry(input: ChainInput): AuditEntry {
   return entry;
 }
 
-/** Record the upload + inference pair produced by an analyze request. */
+/** Record the upload + inference pair produced by an analyze request; returns
+ *  the inference entry so its chained hash can be shown as the result's stamp
+ *  (so the on-screen stamp reconciles with a real row in the trail). */
 export function recordAnalysis(input: {
   timestamp: string;
   subjectId: string;
   regionId: string;
-}): void {
+}): AuditEntry {
   addAuditEntry({ ...input, operator: OPERATORS[0], action: "upload" });
-  addAuditEntry({ ...input, operator: OPERATORS[0], action: "inference" });
+  return addAuditEntry({ ...input, operator: OPERATORS[0], action: "inference" });
 }
 
 /**

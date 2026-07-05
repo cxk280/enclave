@@ -13,11 +13,14 @@ export async function POST() {
   const region = await getServingRegion();
   const result = await runInference(region);
 
-  recordAnalysis({
+  const entry = recordAnalysis({
     timestamp: result.residency.timestamp,
     subjectId: result.subjectId,
     regionId: region.id,
   });
+  // Stamp the result with the *inference audit row's* chained hash so the
+  // "cryptographic audit stamp" on screen reconciles with a real trail row.
+  result.residency.auditHash = `sha256:${entry.fullHash}`;
 
   return NextResponse.json(result);
 }

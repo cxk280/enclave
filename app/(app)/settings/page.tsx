@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   Check,
   Cpu,
@@ -17,19 +16,6 @@ import { useRegion } from "@/components/shell/region-provider";
 
 export default function SettingsPage() {
   const { region, regions, setRegion } = useRegion();
-  const [rePinningTo, setRePinningTo] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!rePinningTo) return;
-    const timeout = setTimeout(() => setRePinningTo(null), 1200);
-    return () => clearTimeout(timeout);
-  }, [rePinningTo]);
-
-  function handleSelect(id: string, city: string) {
-    if (id === region.id) return;
-    setRegion(id);
-    setRePinningTo(city);
-  }
 
   return (
     <div className="flex justify-center p-4 sm:p-8">
@@ -61,7 +47,7 @@ export default function SettingsPage() {
                 <button
                   key={r.id}
                   type="button"
-                  onClick={() => handleSelect(r.id, r.city)}
+                  onClick={() => setRegion(r.id)}
                   className={`flex items-center gap-3.5 rounded-md px-4 py-3.5 text-left transition ${
                     selected
                       ? "border-[1.5px] border-green-border bg-green-bg"
@@ -74,7 +60,11 @@ export default function SettingsPage() {
                       <span className="text-[15px] font-semibold text-ink">{r.city}</span>
                       <span className="font-mono text-[13px] text-ink-muted">{r.id}</span>
                     </div>
-                    <span className="text-[13px] text-ink-secondary">{r.note}</span>
+                    <span className="text-[13px] text-ink-secondary">
+                      {selected
+                        ? `Active · ${r.gpu} · ~${r.latencyMs} ms in-region`
+                        : r.note}
+                    </span>
                   </div>
                   {selected ? (
                     <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green text-white">
@@ -87,12 +77,6 @@ export default function SettingsPage() {
               );
             })}
           </div>
-
-          {rePinningTo && (
-            <p className="text-[13px] font-semibold text-green-text">
-              Re-pinning to {rePinningTo}…
-            </p>
-          )}
 
           <div className="flex items-start gap-2.5 rounded-md border border-green-border bg-green-bg p-3.5">
             <Lock size={18} className="mt-0.5 shrink-0 text-green" />
