@@ -98,7 +98,7 @@ export function ResidencyPanel({ residency }: { residency: ResidencyStamp }) {
           <div className="text-ink-muted">{when}</div>
         </div>
         <Link
-          href="/audit"
+          href={`/audit?q=${hex.slice(0, 12)}`}
           className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-green-text hover:underline"
         >
           View in audit trail

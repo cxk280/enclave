@@ -1,15 +1,16 @@
-import { ChevronDown, Search } from "lucide-react";
-import { AuditTable } from "@/components/audit/audit-table";
+import { AuditBrowser } from "@/components/audit/audit-browser";
 import { ExportAudit } from "@/components/audit/export-button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { StatTile } from "@/components/ui/stat-tile";
 import { getAuditSummary, listAuditEntries } from "@/lib/audit";
 
-const FILTERS = ["Region: af-south-1", "Operator: all", "Action: all", "Last 30 days"];
-
-export default function AuditPage() {
+export default async function AuditPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q } = await searchParams;
   const entries = listAuditEntries();
-  const recent = entries.slice(0, 12);
   const summary = getAuditSummary();
 
   return (
@@ -36,12 +37,7 @@ export default function AuditPage() {
           label="Distinct operators"
           sub="All in-country"
         />
-        <StatTile
-          value="0"
-          label="Egress events"
-          sub="No data left af-south-1"
-          accent
-        />
+        <StatTile value="0" label="Egress events" sub="No data left af-south-1" accent />
         <StatTile
           value={String(summary.regionsTouched)}
           label="Regions touched"
@@ -49,28 +45,7 @@ export default function AuditPage() {
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2.5">
-        <div className="flex min-w-[200px] flex-1 items-center gap-2 rounded-md border border-border-strong bg-surface px-3.5 py-2.5">
-          <Search size={16} className="text-ink-muted" />
-          <input
-            readOnly
-            placeholder="Search by subject, operator, or hash"
-            className="w-full bg-transparent text-[15px] text-ink placeholder:text-ink-muted focus:outline-none"
-          />
-        </div>
-        {FILTERS.map((label) => (
-          <button
-            key={label}
-            type="button"
-            className="inline-flex items-center gap-2 rounded-md border border-border-strong bg-surface px-3.5 py-2.5 text-[15px] font-semibold text-ink hover:bg-surface-2"
-          >
-            {label}
-            <ChevronDown size={16} className="text-ink-muted" />
-          </button>
-        ))}
-      </div>
-
-      <AuditTable entries={recent} total={entries.length} />
+      <AuditBrowser entries={entries} initialQuery={q ?? ""} />
     </div>
   );
 }
