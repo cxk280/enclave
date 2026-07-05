@@ -15,7 +15,7 @@ export const REGIONS: Region[] = [
     gpu: "NVIDIA L40S",
     latencyMs: 18,
     status: "active",
-    note: "Active · NVIDIA L40S · ~18 ms in-region",
+    note: "Sovereign primary · Johannesburg",
   },
   {
     id: "af-south-2",
@@ -26,7 +26,7 @@ export const REGIONS: Region[] = [
     gpu: "NVIDIA L40S",
     latencyMs: 22,
     status: "available",
-    note: "Available · sovereign · in-country failover",
+    note: "Sovereign failover · Cape Town",
   },
   {
     id: "af-east-1",
@@ -37,7 +37,7 @@ export const REGIONS: Region[] = [
     gpu: "NVIDIA A100",
     latencyMs: 26,
     status: "available",
-    note: "Available · sovereign · East Africa",
+    note: "Sovereign · Nairobi, East Africa",
   },
 ];
 

@@ -115,14 +115,16 @@ export function addAuditEntry(input: ChainInput): AuditEntry {
   return entry;
 }
 
-/** Record the upload + inference pair produced by an analyze request. */
+/** Record the upload + inference pair produced by an analyze request; returns
+ *  the inference entry so its chained hash can be shown as the result's stamp
+ *  (so the on-screen stamp reconciles with a real row in the trail). */
 export function recordAnalysis(input: {
   timestamp: string;
   subjectId: string;
   regionId: string;
-}): void {
+}): AuditEntry {
   addAuditEntry({ ...input, operator: OPERATORS[0], action: "upload" });
-  addAuditEntry({ ...input, operator: OPERATORS[0], action: "inference" });
+  return addAuditEntry({ ...input, operator: OPERATORS[0], action: "inference" });
 }
 
 /**
@@ -146,6 +148,19 @@ export function verifyAuditChain(): boolean {
     }
   }
   return true;
+}
+
+/** Self-contained description so a regulator can independently recompute and
+ *  verify the hash chain from an export, without inside knowledge. */
+export function getAuditVerification() {
+  return {
+    algorithm: "SHA-256",
+    genesisHash: GENESIS,
+    chainRule:
+      "fullHash[n] = SHA-256(fullHash[n-1] | timestamp | operator | action | subjectId | regionId), '|'-joined; fullHash[0] chains from genesisHash",
+    chainValid: verifyAuditChain(),
+    note: "Demonstration data — synthetic and de-identified.",
+  };
 }
 
 export function getAuditSummary(): AuditSummary {

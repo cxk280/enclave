@@ -11,8 +11,9 @@ test("the sovereign demo flow: landing → analyze → residency proof", async (
   await page.getByRole("link", { name: /enter the demo/i }).first().click();
   await expect(page).toHaveURL(/\/workspace$/);
 
-  await page.getByRole("button", { name: /analyze in-region/i }).click();
-  await expect(page).toHaveURL(/\/workspace\/result$/);
+  // "Analyze in-region" is a link (works before hydration on slow networks).
+  await page.getByRole("link", { name: /analyze in-region/i }).click();
+  await expect(page).toHaveURL(/\/workspace\/result/);
 
   await expect(page.getByText(/Processed in Johannesburg/i)).toBeVisible({
     timeout: 15_000,

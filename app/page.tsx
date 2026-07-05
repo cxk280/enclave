@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Wordmark } from "@/components/shell/wordmark";
-import { Button, buttonClasses } from "@/components/ui/button";
+import { buttonClasses } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Pill } from "@/components/ui/pill";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -61,7 +61,9 @@ export default function LandingPage() {
           <Link href="/workspace" className={buttonClasses("primary")}>
             Enter the demo <ArrowRight size={18} />
           </Link>
-          <Button variant="secondary">See the guarantee</Button>
+          <Link href="#difference" className={buttonClasses("secondary")}>
+            See the guarantee
+          </Link>
         </div>
 
         <div className="flex items-center gap-2 text-[13px] text-ink-muted">
@@ -180,6 +182,15 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <footer className="border-t border-border-subtle px-4 py-6 sm:px-10">
+        <p className="mx-auto max-w-[1120px] text-[12px] leading-5 text-ink-muted">
+          A Vultr capability demonstration. All data is synthetic and de-identified.
+          The sovereignty properties shown illustrate the target Vultr Sovereign Cloud
+          architecture — they are not a compliance certification, and the copy here is
+          demonstration language, not a legal representation.
+        </p>
+      </footer>
     </div>
   );
 }

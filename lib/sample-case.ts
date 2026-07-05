@@ -40,27 +40,29 @@ export const SAMPLE_CASE = {
     },
     {
       system: "CPT",
-      code: "99204",
-      label: "Office visit, new patient",
-      confidence: 0.69,
+      code: "71046",
+      label: "Radiologic exam, chest; 2 views",
+      confidence: 0.82,
     },
   ] satisfies CodeSuggestion[],
   imaging: {
     modality: "PA chest X-ray",
     findings: [
+      // Boxes sit on the viewer's LEFT — the patient's RIGHT on a PA film —
+      // to match these right-sided findings.
       {
         id: "f1",
         label: "Right lower lobe opacity",
         confidence: 0.91,
         kind: "finding",
-        box: { x: 60, y: 50, w: 24, h: 22 },
+        box: { x: 15, y: 46, w: 26, h: 20 },
       },
       {
         id: "f2",
         label: "Blunted right costophrenic angle",
         confidence: 0.63,
         kind: "finding",
-        box: { x: 58, y: 68, w: 20, h: 14 },
+        box: { x: 15, y: 76, w: 22, h: 12 },
       },
       {
         id: "f3",
