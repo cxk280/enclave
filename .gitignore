@@ -36,3 +36,7 @@ test-results/
 docs/EDGE_CASES.md
 docs/USERS.md
 docs/USER_PERSONAS_FINDING.md
+
+# Vultr deploy state (never commit)
+scripts/vultr/.instance-id
+.vultr*.env
