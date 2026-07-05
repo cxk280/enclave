@@ -152,7 +152,7 @@ export function AuditBrowser({
           {query
             ? `${matches.length} match${matches.length === 1 ? "" : "es"} for “${q}” across all ${entries.length.toLocaleString()} accesses.`
             : entries.length > matches.length
-              ? `Showing the ${matches.length} most recent of ${entries.length.toLocaleString()} accesses · search by hash to reconcile any row, or export the full region-locked log.`
+              ? `Showing the ${matches.length} most recent of ${entries.length.toLocaleString()} accesses · search by subject, operator, or hash to reconcile any row, or export the full region-locked log.`
               : null}
         </div>
       </Card>

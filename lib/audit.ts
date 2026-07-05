@@ -150,6 +150,19 @@ export function verifyAuditChain(): boolean {
   return true;
 }
 
+/** Self-contained description so a regulator can independently recompute and
+ *  verify the hash chain from an export, without inside knowledge. */
+export function getAuditVerification() {
+  return {
+    algorithm: "SHA-256",
+    genesisHash: GENESIS,
+    chainRule:
+      "fullHash[n] = SHA-256(fullHash[n-1] | timestamp | operator | action | subjectId | regionId), '|'-joined; fullHash[0] chains from genesisHash",
+    chainValid: verifyAuditChain(),
+    note: "Demonstration data — synthetic and de-identified.",
+  };
+}
+
 export function getAuditSummary(): AuditSummary {
   return {
     totalAccesses: store.length,

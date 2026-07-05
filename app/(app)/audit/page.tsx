@@ -22,6 +22,9 @@ export default async function AuditPage({
           <p className="mt-1 text-[14px] text-ink-secondary">
             Every PHI access, attributed to an in-country operator. Hand this to the regulator.
           </p>
+          <p className="mt-1 text-[12px] text-ink-muted">
+            Demonstration data — synthetic and de-identified.
+          </p>
         </div>
         <ExportAudit />
       </div>
